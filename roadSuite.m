@@ -29,7 +29,7 @@ switch roadCase %create a switch case function so that when different road cases
 
     case 'washboard'
         washStart = 1.0; %start time is 1 second into the imulation
-        washHeight = 0.05; %set the height of the bump
+        washHeight = 0.02; %set the height of the bump
         washFrequency = 4; %set the frequency
         idx = t >= washStart; %bumps occurs repeatedly, so all the times after bump starts stores into idx
         x = t(idx)-washStart;

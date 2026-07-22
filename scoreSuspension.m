@@ -1,37 +1,27 @@
-function results = scoreSuspension(simout, roadName)
-% SCORESUSPENSION Compute objective metrics from a quarter-car sim run.
-%
-%   results = scoreSuspension(simout, roadName) pulls the logged
-%   sprung-mass acceleration, suspension travel, and tire deflection
-%   signals out of simout, computes comfort/packaging/road-holding
-%   metrics, and returns them along with a combined score.
+function results = scoreSuspension(simout, roadName) %function pulled from instructions
 
-% Pull sprung-mass acceleration signal out of the sim output
-accelElem = simout.yout.getElement('sprungAccel');
-accel = accelElem.Values.Data;
+accelElem = simout.yout.getElement('sprungAccel'); %set accelElem as a variable, then use parameter name with getElement to get sprungAccel elements only
+accel = accelElem.Values.Data; %this gives the raw numeric data from sprungAccel
 
-% Pull suspension travel signal out of the sim output
-suspElem = simout.yout.getElement('suspTravel');
-suspTrav = suspElem.Values.Data;
-
-% Pull tire deflection signal out of the sim output
-tireElem = simout.yout.getElement('tireDeflection');
+tireElem = simout.yout.getElement('tireDeflection'); %same principle as sprungAccel
 tireDefl = tireElem.Values.Data;
 
-% Comfort metric: RMS of sprung-mass acceleration
-comfortRMS = rms(accel);
-% Packaging metric: max suspension travel (absolute value)
-packagingMax = max(abs(suspTrav));
-% Road-holding metric: max tire deflection (absolute value)
-roadHoldingMax = max(abs(tireDefl));
+suspElem = simout.yout.getElement('suspTravel'); %same principle as sprungAccel
+suspTrav = suspElem.Values.Data;
 
-% Package everything into the output struct
+comfortRMS = rms(accel); %use the rms function to get the comfortRMS from accel data
+packagingMax = max(abs(suspTrav)); %use the max function to get the max packaging from suspTrav data, and abs to ensure that only positive numbers are taken 
+roadHoldingMax = max(abs(tireDefl));%use the max function to get the max road holding from road holding data, and abs to ensure that only positive numbers are taken
+
+%create a struct named results and store all the data in the struct
 results.roadName = roadName;
 results.comfortRMS = comfortRMS;
 results.packagingMax = packagingMax;
 results.roadHoldingMax = roadHoldingMax;
 
-% Combined score: lower is better, sum of all three metrics
-score = (comfortRMS+packagingMax+roadHoldingMax);
+%add up the scores from comfortRMS, packagingMax, and roadHoldingMax
+score = comfortRMS + packagingMax + roadHoldingMax;
+%put score in the results struct as well
 results.score = score;
+
 end
