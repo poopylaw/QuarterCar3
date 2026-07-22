@@ -18,8 +18,8 @@ Ms = 300;      % Sprung mass, [kg]
 Mu = 40;       % Unsprung mass, [kg]
 
 %% Suspension parameters
-Ks = 16000;    % Suspension spring stiffness, [N/m]
-Cs = 1500;     % Suspension damping coefficient, [N*s/m]
+Ks = 12000;    % Suspension spring stiffness, [N/m]
+Cs = 1000;     % Suspension damping coefficient, [N*s/m]
 
 %% Tire parameters
 Kt = 190000;   % Tire stiffness, [N/m]
