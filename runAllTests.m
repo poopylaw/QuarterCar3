@@ -1,58 +1,48 @@
-function summaryTable = runAllTests()
-% RUNALLTESTS Run all road cases, score each, check pass/fail, save results.
-%
-%   summaryTable = runAllTests() runs the full road test suite against
-%   quarterCarModel, scores each run using scoreSuspension, checks
-%   pass/fail against design limits, and saves a summary table + plot
-%   to a "results" folder.
+function summaryTable = runAllTests() %create a function called runAllTests with summaryTable as output
 
-% Load model parameters (Ms, Mu, Ks, Cs, Kt, Ct) from the setup script
-setupQuarterCar;
+setupQuarterCar; %run the setupQuarterCar.m file 
 
-% Pass/fail limits -- a road case only "passes" if it satisfies all three
-comfortLimit  = 2.0;    % m/s^2, max acceptable RMS acceleration
-travelLimit   = 0.08;   % m, max acceptable suspension travel
-tireDeflLimit = 0.03;   % m, max acceptable tire deflection
+comfortLimit = 2.0; %setup the limit for comfortRMS, travel, and tireDefl
+travelLimit = 0.08;
+tireDeflLimit = 0.03;
 
-roadCases = {'speedBump', 'pothole', 'roughRoad', 'washboard', 'twoBumps'};
+roadCases = {'speedBump', 'pothole', 'roughRoad', 'washboard', 'twoBumps'}; %create cell arrays for the 5 road cases
 
-resultsList = struct([]);   % will collect one result struct per road case
+resultsArray = struct([]); %create an empty struct array
 
-for i=1:length(roadCases)
-    roadCase = roadCases{i};
-    roadInput = roadSuite(roadCase);
-    assignin('base', 'roadInput', roadInput);   % model reads roadInput from the base workspace
+for i = 1:length(roadCases) %use the for loop to loop through all the road cases
 
-    % Run the simulation for this road case
-    simIn = Simulink.SimulationInput('quarterCarModel');
-    out = sim(simIn);
+    roadCase = roadCases{i}; %road case variable loops through all of the road cases
 
-    % Score the results and check pass/fail against the limits above
-    results = scoreSuspension(out, roadCase);
+    roadInput = roadSuite(roadCase); %create a variable to call each road cases in roadSuite.m
+
+    assignin('base', 'roadInput', roadInput); %copy roadInput into the base workspace so it exists outside of the function
+
+    simPrep = Simulink.SimulationInput('quarterCarModel'); %call the simulation called quarterCarModel
+    simStart = sim(simPrep); %run the simulation 
+
+    results = scoreSuspension(simStart, roadCase); %set a variable called result and use the scoreSuspension.m file to score each case
+
     results.pass = results.comfortRMS <= comfortLimit && ...
                     results.packagingMax <= travelLimit && ...
-                    results.roadHoldingMax <= tireDeflLimit;
+                    results.roadHoldingMax <= tireDeflLimit; %set pass in the result struct
 
-    resultsList = [resultsList, results];
+    resultsArray = [resultsArray, results]; %create a new array for results and store them into the empty array created earlier
+
 end
 
-% Combine all 5 road cases into one table and display it
-summaryTable = struct2table(resultsList);
-disp(summaryTable);
+summaryTable = struct2table(resultsArray) %turn the array into table 
 
-% Create a results folder (if it doesn't already exist) for saved outputs
-if ~exist('results', 'dir')
-    mkdir('results');
+if ~exist('results', 'dir') %search for result directory, if it does no exists run the following
+    mkdir('results'); %create directory named results
 end
 
-% Bar chart comparing score across road cases (lower score = better)
+%create a plot with different labels
 figure;
 bar(categorical(summaryTable.roadName), summaryTable.score);
 ylabel('Score (lower = better)');
 title('Suspension Score by Road Case');
 saveas(gcf, fullfile('results', 'summaryPlot.png'));
-
-% Save the results table so it persists beyond this MATLAB session
 save(fullfile('results', 'summaryTable.mat'), 'summaryTable');
 
 end
