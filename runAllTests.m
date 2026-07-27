@@ -1,6 +1,13 @@
 function summaryTable = runAllTests() %create a function called runAllTests with summaryTable as output
 
-setupQuarterCar; %run the setupQuarterCar.m file 
+setupQuarterCar; %run the setupQuarterCar.m file
+assignin('base', 'Ks', Ks); %use these so that all the variable are also found in the workspace 
+assignin('base', 'Kt', Kt);
+assignin('base', 'Cs', Cs);
+assignin('base', 'Ct', Ct);
+assignin('base', 'Ms', Ms);
+assignin('base', 'Mu', Mu);
+
 
 comfortLimit = 2.0; %setup the limit for comfortRMS, travel, and tireDefl
 travelLimit = 0.08;
